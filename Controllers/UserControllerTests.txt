@@ -1,0 +1,87 @@
+using CRUD_application_2.Controllers;
+using CRUD_application_2.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+
+namespace CRUD_application_2.Tests.Controllers
+{
+    [TestClass]
+    public class UserControllerTests
+    {
+        [TestMethod]
+        public void Index_ReturnsViewWithUserList()
+        {
+            // Arrange
+            var controller = new UserController();
+            var userList = new List<User>
+            {
+                new User { Id = 1, Name = "John", Email = "john@example.com" },
+                new User { Id = 2, Name = "Jane", Email = "jane@example.com" }
+            };
+            UserController.userlist = userList;
+
+            // Act
+            var result = controller.Index() as ViewResult;
+            var model = result.Model as List<User>;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(userList.Count, model.Count);
+            Assert.AreEqual(userList[0].Id, model[0].Id);
+            Assert.AreEqual(userList[0].Name, model[0].Name);
+            Assert.AreEqual(userList[0].Email, model[0].Email);
+            Assert.AreEqual(userList[1].Id, model[1].Id);
+            Assert.AreEqual(userList[1].Name, model[1].Name);
+            Assert.AreEqual(userList[1].Email, model[1].Email);
+        }
+
+        [TestMethod]
+        public void Details_ValidId_ReturnsViewWithUser()
+        {
+            // Arrange
+            var controller = new UserController();
+            var userList = new List<User>
+            {
+                new User { Id = 1, Name = "John", Email = "john@example.com" },
+                new User { Id = 2, Name = "Jane", Email = "jane@example.com" }
+            };
+            UserController.userlist = userList;
+            var userId = 1;
+
+            // Act
+            var result = controller.Details(userId) as ViewResult;
+            var model = result.Model as User;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(userList[0].Id, model.Id);
+            Assert.AreEqual(userList[0].Name, model.Name);
+            Assert.AreEqual(userList[0].Email, model.Email);
+        }
+
+        [TestMethod]
+        public void Details_InvalidId_ReturnsHttpNotFound()
+        {
+            // Arrange
+            var controller = new UserController();
+            var userList = new List<User>
+            {
+                new User { Id = 1, Name = "John", Email = "john@example.com" },
+                new User { Id = 2, Name = "Jane", Email = "jane@example.com" }
+            };
+            UserController.userlist = userList;
+            var userId = 3;
+
+            // Act
+            var result = controller.Details(userId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(HttpNotFoundResult));
+        }
+
+        // Add unit tests for other actions (Create, Edit, Delete) following a similar pattern
+        // ...
+    }
+}
