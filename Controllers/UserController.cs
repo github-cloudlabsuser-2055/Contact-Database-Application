@@ -1,7 +1,7 @@
-using CRUD_application_2.Models;
+﻿using CRUD_application_2.Models;
 using System.Linq;
 using System.Web.Mvc;
- 
+
 namespace CRUD_application_2.Controllers
 {
     public class UserController : Controller
@@ -37,6 +37,7 @@ namespace CRUD_application_2.Controllers
         {
             if (ModelState.IsValid)
             {
+                user.Id = userlist.Any() ? userlist.Max(u => u.Id) + 1 : 1;
                 userlist.Add(user);
                 return RedirectToAction("Index");
             }
@@ -56,15 +57,15 @@ namespace CRUD_application_2.Controllers
 
         // POST: User/Edit/5
         [HttpPost]
-        public ActionResult Edit(User user)
+        public ActionResult Edit(int id, User user)
         {
+            var existingUser = userlist.FirstOrDefault(u => u.Id == id);
+            if (existingUser == null)
+            {
+                return HttpNotFound();
+            }
             if (ModelState.IsValid)
             {
-                var existingUser = userlist.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser == null)
-                {
-                    return HttpNotFound();
-                }
                 existingUser.Name = user.Name;
                 existingUser.Email = user.Email;
                 return RedirectToAction("Index");
@@ -84,8 +85,8 @@ namespace CRUD_application_2.Controllers
         }
 
         // POST: User/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
         {
             var user = userlist.FirstOrDefault(u => u.Id == id);
             if (user == null)
@@ -94,13 +95,6 @@ namespace CRUD_application_2.Controllers
             }
             userlist.Remove(user);
             return RedirectToAction("Index");
-        }
-
-        // GET: User/Search
-        public ActionResult Search(string searchTerm)
-        {
-            var searchResults = userlist.Where(u => u.Name.Contains(searchTerm) || u.Email.Contains(searchTerm)).ToList();
-            return View(searchResults);
         }
     }
 }
